@@ -2,24 +2,59 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Tumblr Feed (All Posts)</title>
+  <title>Tumblr Feed 横並び表示</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 1em;
     }
-    .post {
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 1.5em;
-      padding-bottom: 1em;
+    #tumblr-feed {
+      display: flex;
+      gap: 16px; /* 投稿間のスペース */
+      overflow-x: auto; /* 横スクロール可能に */
+      padding-bottom: 10px;
     }
-    img {
-      max-width: 100%;
+    .post {
+      flex: 0 0 180px; /* 投稿の横幅を固定 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #ccc;
       border-radius: 8px;
+      padding: 8px;
+      box-sizing: border-box;
+      background: #fafafa;
+    }
+    .post img {
+      width: 100%;
+      height: 300px; /* 縦長に固定 */
+      object-fit: cover; /* 画像の縦横比を保ちつつ切り抜き */
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: #eee;
     }
     .title {
       font-weight: bold;
-      margin-bottom: 0.5em;
+      font-size: 0.9em;
+      margin-bottom: 6px;
+      text-align: center;
+      height: 2.4em; /* 2行分くらい */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* 2行まで表示 */
+      -webkit-box-orient: vertical;
+    }
+    .body-text {
+      font-size: 0.8em;
+      color: #555;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 3.6em; /* 3行分くらい */
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /* 3行まで表示 */
+      -webkit-box-orient: vertical;
+      text-align: center;
     }
   </style>
 </head>
@@ -39,6 +74,23 @@
           const div = document.createElement("div");
           div.className = "post";
 
+          // 画像があれば1枚目を使う
+          if (post.photos && post.photos.length > 0) {
+            const img = document.createElement("img");
+            img.src = post.photos[0].original_size.url;
+            img.alt = post.summary || "Tumblr photo";
+            div.appendChild(img);
+          } else {
+            // 画像がない投稿はダミー画像 or 空白を入れて揃える（optional）
+            const img = document.createElement("div");
+            img.style.width = "100%";
+            img.style.height = "300px";
+            img.style.background = "#ddd";
+            img.style.borderRadius = "6px";
+            div.appendChild(img);
+          }
+
+          // タイトル（あれば）
           if (post.title) {
             const title = document.createElement("div");
             title.className = "title";
@@ -46,19 +98,12 @@
             div.appendChild(title);
           }
 
+          // 本文（あれば）
           if (post.body) {
             const body = document.createElement("div");
+            body.className = "body-text";
             body.innerHTML = post.body;
             div.appendChild(body);
-          }
-
-          if (post.photos && post.photos.length > 0) {
-            post.photos.forEach(photo => {
-              const img = document.createElement("img");
-              img.src = photo.original_size.url;
-              img.alt = post.summary || "Tumblr photo";
-              div.appendChild(img);
-            });
           }
 
           container.appendChild(div);
@@ -75,3 +120,4 @@
   </script>
 </body>
 </html>
+
