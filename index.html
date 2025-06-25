@@ -10,12 +10,12 @@
     }
     #tumblr-feed {
       display: flex;
-      gap: 16px; /* 投稿間のスペース */
-      overflow-x: auto; /* 横スクロール可能に */
+      gap: 16px;
+      overflow-x: auto;
       padding-bottom: 10px;
     }
     .post {
-      flex: 0 0 180px; /* 投稿の横幅を固定 */
+      flex: 0 0 180px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -27,34 +27,23 @@
     }
     .post img {
       width: 100%;
-      height: 300px; /* 縦長に固定 */
-      object-fit: cover; /* 画像の縦横比を保ちつつ切り抜き */
+      height: 300px;
+      object-fit: cover;
       border-radius: 6px;
       margin-bottom: 8px;
       background: #eee;
+      display: block;
     }
-    .title {
-      font-weight: bold;
-      font-size: 0.9em;
-      margin-bottom: 6px;
+    .post a.post-link {
+      font-size: 0.85em;
+      color: #0077cc;
+      text-decoration: none;
       text-align: center;
-      height: 2.4em; /* 2行分くらい */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; /* 2行まで表示 */
-      -webkit-box-orient: vertical;
+      word-break: break-word;
+      max-width: 100%;
     }
-    .body-text {
-      font-size: 0.8em;
-      color: #555;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      height: 3.6em; /* 3行分くらい */
-      display: -webkit-box;
-      -webkit-line-clamp: 3; /* 3行まで表示 */
-      -webkit-box-orient: vertical;
-      text-align: center;
+    .post a.post-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -63,7 +52,7 @@
   <div id="tumblr-feed">読み込み中...</div>
 
   <script>
-    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts?api_key=si8aqzDTqqbW7JLo68RjZtGeAsLNg182VXZhLo1lYB9XsOzZKv")
+    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts?api_key=YOUR_REAL_API_KEY_HERE")
       .then(res => res.json())
       .then(data => {
         const posts = data.response.posts;
@@ -74,37 +63,34 @@
           const div = document.createElement("div");
           div.className = "post";
 
-          // 画像があれば1枚目を使う
+          // 画像またはダミー画像を作成
+          let imgElem;
           if (post.photos && post.photos.length > 0) {
-            const img = document.createElement("img");
-            img.src = post.photos[0].original_size.url;
-            img.alt = post.summary || "Tumblr photo";
-            div.appendChild(img);
+            imgElem = document.createElement("img");
+            imgElem.src = post.photos[0].original_size.url;
+            imgElem.alt = post.summary || "Tumblr photo";
           } else {
-            // 画像がない投稿はダミー画像 or 空白を入れて揃える（optional）
-            const img = document.createElement("div");
-            img.style.width = "100%";
-            img.style.height = "300px";
-            img.style.background = "#ddd";
-            img.style.borderRadius = "6px";
-            div.appendChild(img);
+            // 画像がない場合はシンプルなグレー背景のボックスを代わりに表示
+            imgElem = document.createElement("div");
+            imgElem.style.width = "100%";
+            imgElem.style.height = "300px";
+            imgElem.style.background = "#ddd";
+            imgElem.style.borderRadius = "6px";
           }
 
-          // タイトル（あれば）
-          if (post.title) {
-            const title = document.createElement("div");
-            title.className = "title";
-            title.textContent = post.title;
-            div.appendChild(title);
-          }
+          div.appendChild(imgElem);
 
-          // 本文（あれば）
-          if (post.body) {
-            const body = document.createElement("div");
-            body.className = "body-text";
-            body.innerHTML = post.body;
-            div.appendChild(body);
-          }
+          // 投稿URLリンクを画像の下に作成
+          const a = document.createElement("a");
+          a.href = post.post_url || "#";
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.className = "post-link";
+
+          // リンクテキストはタイトル、なければ "投稿を見る"
+          a.textContent = post.title ? post.title : "投稿を見る";
+
+          div.appendChild(a);
 
           container.appendChild(div);
         });
@@ -120,4 +106,3 @@
   </script>
 </body>
 </html>
-
