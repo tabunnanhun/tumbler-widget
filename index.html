@@ -86,4 +86,22 @@
           const a = document.createElement("a");
           a.href = postUrl;
           a.target = "_blank";
-          a.rel
+          a.rel = "noopener noreferrer";
+          a.className = "post-link";
+          a.textContent = post.title ? post.title : "投稿を見る";
+          div.appendChild(a);
+
+          container.appendChild(div);
+        });
+
+        if (container.innerHTML === "") {
+          container.innerText = "投稿が見つかりませんでした。";
+        }
+      })
+      .catch(err => {
+        document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
+        console.error("Tumblr API Error:", err);
+      });
+  </script>
+</body>
+</html>
