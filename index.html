@@ -1,17 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Test</title>
+  <meta charset="UTF-8" />
+  <title>Tumblr Feed (All Posts)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+    }
+    .post {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 1.5em;
+      padding-bottom: 1em;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .title {
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+  </style>
 </head>
 <body>
+  <h2>Latest Tumblr Posts</h2>
   <div id="tumblr-feed">読み込み中...</div>
 
   <script>
-    // ただ3秒後に消すだけのテスト
-    setTimeout(() => {
-      document.getElementById("tumblr-feed").innerText = "テスト成功！";
-    }, 3000);
+    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts?api_key=si8aqzDTqqbW7JLo68RjZtGeAsLNg182VXZhLo1lYB9XsOzZKv")
+      .then(res => res.json())
+      .then(data => {
+        const posts = data.response.posts;
+        const container = document.getElementById("tumblr-feed");
+        container.innerHTML = "";
+
+        posts.slice(0, 5).forEach(post => {
+          const div = document.createElement("div");
+          div.className = "post";
+
+          if (post.title) {
+            const title = document.createElement("div");
+            title.className = "title";
+            title.textContent = post.title;
+            div.appendChild(title);
+          }
+
+          if (post.body) {
+            const body = document.createElement("div");
+            body.innerHTML = post.body;
+            div.appendChild(body);
+          }
+
+          if (post.photos && post.photos.length > 0) {
+            post.photos.forEach(photo => {
+              const img = document.createElement("img");
+              img.src = photo.original_size.url;
+              img.alt = post.summary || "Tumblr photo";
+              div.appendChild(img);
+            });
+          }
+
+          container.appendChild(div);
+        });
+
+        if (container.innerHTML === "") {
+          container.innerText = "投稿が見つかりませんでした。";
+        }
+      })
+      .catch(err => {
+        document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
+        console.error("Tumblr API Error:", err);
+      });
   </script>
 </body>
 </html>
