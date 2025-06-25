@@ -27,13 +27,20 @@
         const container = document.getElementById("tumblr-feed");
         container.innerHTML = "";
 
-        posts.slice(0, 3).forEach(post => {
+        posts.slice(0, 5).forEach(post => {
+          // 画像があるか確認
           if (post.photos && post.photos.length > 0) {
             const img = document.createElement("img");
             img.src = post.photos[0].original_size.url;
+            img.alt = post.summary || "Tumblr photo";
             container.appendChild(img);
           }
         });
+
+        // 画像付き投稿が1件もなかった場合
+        if (container.innerHTML === "") {
+          container.innerText = "画像付きの投稿が見つかりませんでした。";
+        }
       })
       .catch(err => {
         document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
