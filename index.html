@@ -66,16 +66,18 @@
           // 画像またはダミー画像を作成
           let imgElem;
           if (post.photos && post.photos.length > 0) {
-            imgElem = document.createElement("img");
-            imgElem.src = post.photos[0].original_size.url;
-            imgElem.alt = post.summary || "Tumblr photo";
+            const img = document.createElement("img");
+            img.src = post.photos[0].original_size.url;
+            img.alt = post.summary || "Tumblr photo";
+            div.appendChild(img);
           } else {
-            // 画像がない場合はシンプルなグレー背景のボックスを代わりに表示
-            imgElem = document.createElement("div");
-            imgElem.style.width = "100%";
-            imgElem.style.height = "300px";
-            imgElem.style.background = "#ddd";
-            imgElem.style.borderRadius = "6px";
+            // 画像がない投稿はダミー画像 or 空白を入れて揃える（optional）
+            const img = document.createElement("div");
+            img.style.width = "100%";
+            img.style.height = "300px";
+            img.style.background = "#ddd";
+            img.style.borderRadius = "6px";
+            div.appendChild(img);
           }
 
           div.appendChild(imgElem);
