@@ -2,16 +2,24 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Tumblr Widget</title>
+  <title>Tumblr Feed (All Posts)</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 1em;
     }
+    .post {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 1.5em;
+      padding-bottom: 1em;
+    }
     img {
       max-width: 100%;
-      margin-bottom: 10px;
       border-radius: 8px;
+    }
+    .title {
+      font-weight: bold;
+      margin-bottom: 0.5em;
     }
   </style>
 </head>
@@ -20,7 +28,7 @@
   <div id="tumblr-feed">読み込み中...</div>
 
   <script>
-    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts/photo?api_key=si8aqzDTqqbW7JLo68RjZtGeAsLNg182VXZhLo1lYB9XsOzZKv")
+    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts?api_key=YOUR_REAL_API_KEY_HERE")
       .then(res => res.json())
       .then(data => {
         const posts = data.response.posts;
@@ -28,18 +36,39 @@
         container.innerHTML = "";
 
         posts.slice(0, 5).forEach(post => {
-          // 画像があるか確認
-          if (post.photos && post.photos.length > 0) {
-            const img = document.createElement("img");
-            img.src = post.photos[0].original_size.url;
-            img.alt = post.summary || "Tumblr photo";
-            container.appendChild(img);
+          const div = document.createElement("div");
+          div.className = "post";
+
+          // タイトル（あれば）
+          if (post.title) {
+            const title = document.createElement("div");
+            title.className = "title";
+            title.textContent = post.title;
+            div.appendChild(title);
           }
+
+          // テキスト本文（あれば）
+          if (post.body) {
+            const body = document.createElement("div");
+            body.innerHTML = post.body;
+            div.appendChild(body);
+          }
+
+          // 画像がある場合は画像も表示
+          if (post.photos && post.photos.length > 0) {
+            post.photos.forEach(photo => {
+              const img = document.createElement("img");
+              img.src = photo.original_size.url;
+              img.alt = post.summary || "Tumblr photo";
+              div.appendChild(img);
+            });
+          }
+
+          container.appendChild(div);
         });
 
-        // 画像付き投稿が1件もなかった場合
         if (container.innerHTML === "") {
-          container.innerText = "画像付きの投稿が見つかりませんでした。";
+          container.innerText = "投稿が見つかりませんでした。";
         }
       })
       .catch(err => {
