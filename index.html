@@ -63,48 +63,27 @@
           const div = document.createElement("div");
           div.className = "post";
 
+          // 投稿URL
+          const postUrl = post.post_url || "#";
+
           // 画像またはダミー画像を作成
           let imgElem;
           if (post.photos && post.photos.length > 0) {
-            const img = document.createElement("img");
-            img.src = post.photos[0].original_size.url;
-            img.alt = post.summary || "Tumblr photo";
-            div.appendChild(img);
+            imgElem = document.createElement("img");
+            imgElem.src = post.photos[0].original_size.url;
+            imgElem.alt = post.summary || "Tumblr photo";
           } else {
-            // 画像がない投稿はダミー画像 or 空白を入れて揃える（optional）
-            const img = document.createElement("div");
-            img.style.width = "100%";
-            img.style.height = "300px";
-            img.style.background = "#ddd";
-            img.style.borderRadius = "6px";
-            div.appendChild(img);
+            imgElem = document.createElement("div");
+            imgElem.style.width = "100%";
+            imgElem.style.height = "300px";
+            imgElem.style.background = "#ddd";
+            imgElem.style.borderRadius = "6px";
           }
 
           div.appendChild(imgElem);
 
           // 投稿URLリンクを画像の下に作成
           const a = document.createElement("a");
-          a.href = post.post_url || "#";
+          a.href = postUrl;
           a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          a.className = "post-link";
-
-          // リンクテキストはタイトル、なければ "投稿を見る"
-          a.textContent = post.title ? post.title : "投稿を見る";
-
-          div.appendChild(a);
-
-          container.appendChild(div);
-        });
-
-        if (container.innerHTML === "") {
-          container.innerText = "投稿が見つかりませんでした。";
-        }
-      })
-      .catch(err => {
-        document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
-        console.error("Tumblr API Error:", err);
-      });
-  </script>
-</body>
-</html>
+          a.rel
