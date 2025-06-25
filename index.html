@@ -26,10 +26,13 @@
         const posts = data.response.posts;
         const container = document.getElementById("tumblr-feed");
         container.innerHTML = "";
+
         posts.slice(0, 3).forEach(post => {
-          const img = document.createElement("img");
-          img.src = post.photos[0].original_size.url;
-          container.appendChild(img);
+          if (post.photos && post.photos.length > 0) {
+            const img = document.createElement("img");
+            img.src = post.photos[0].original_size.url;
+            container.appendChild(img);
+          }
         });
       })
       .catch(err => {
