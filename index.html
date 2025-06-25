@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tumblr Widget</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+    }
+    img {
+      max-width: 100%;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Latest Tumblr Posts</h2>
+  <div id="tumblr-feed">読み込み中...</div>
+
+  <script>
+    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts/photo?api_key=si8aqzDTqqbW7JLo68RjZtGeAsLNg182VXZhLo1lYB9XsOzZKv")
+      .then(res => res.json())
+      .then(data => {
+        const posts = data.response.posts;
+        const container = document.getElementById("tumblr-feed");
+        container.innerHTML = "";
+        posts.slice(0, 3).forEach(post => {
+          const img = document.createElement("img");
+          img.src = post.photos[0].original_size.url;
+          container.appendChild(img);
+        });
+      })
+      .catch(err => {
+        document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
+        console.error("Tumblr API Error:", err);
+      });
+  </script>
+</body>
+</html>
