@@ -52,10 +52,10 @@
   <div id="tumblr-feed">読み込み中...</div>
 
   <script>
-    fetch("https://api.tumblr.com/v2/blog/tabunnanhun.tumblr.com/posts?api_key=si8aqzDTqqbW7JLo68RjZtGeAsLNg182VXZhLo1lYB9XsOzZKv")
-      .then(res => res.json())
+    fetch("https://api.rss2json.com/v1/api.json?rss_url=https://tabunnanhun.tumblr.com/rss")
+      .then(response => response.json())
       .then(data => {
-        const posts = data.response.posts;
+        const posts = data.items;
         const container = document.getElementById("tumblr-feed");
         container.innerHTML = "";
 
@@ -63,44 +63,31 @@
           const div = document.createElement("div");
           div.className = "post";
 
-          // 投稿URL
-          const postUrl = post.post_url || "#";
+          // 投稿の画像をdescriptionの中から抽出
+          const match = post.description.match(/<img.+?src=["'](.+?)["']/);
+          const imgURL = match ? match[1] : null;
 
-          // 画像またはダミー画像を作成
-          let imgElem;
-          if (post.photos && post.photos.length > 0) {
-            imgElem = document.createElement("img");
-            imgElem.src = post.photos[0].original_size.url;
-            imgElem.alt = post.summary || "Tumblr photo";
-          } else {
-            imgElem = document.createElement("div");
-            imgElem.style.width = "100%";
-            imgElem.style.height = "300px";
-            imgElem.style.background = "#ddd";
-            imgElem.style.borderRadius = "6px";
+          if (imgURL) {
+            const img = document.createElement("img");
+            img.src = imgURL;
+            img.alt = post.title || "Tumblr image";
+            div.appendChild(img);
           }
 
-          div.appendChild(imgElem);
-
-          // 投稿URLリンクを画像の下に作成
+          // 投稿タイトル or リンク
           const a = document.createElement("a");
-          a.href = postUrl;
+          a.href = post.link;
           a.target = "_blank";
-          a.rel = "noopener noreferrer";
           a.className = "post-link";
-          a.textContent = post.title ? post.title : "投稿を見る";
+          a.textContent = post.title || "投稿を見る";
           div.appendChild(a);
 
           container.appendChild(div);
         });
-
-        if (container.innerHTML === "") {
-          container.innerText = "投稿が見つかりませんでした。";
-        }
       })
-      .catch(err => {
+      .catch(error => {
         document.getElementById("tumblr-feed").innerText = "読み込みに失敗しました";
-        console.error("Tumblr API Error:", err);
+        console.error("RSS2JSON error:", error);
       });
   </script>
 </body>
